@@ -276,7 +276,7 @@ public class MainActivity extends Activity {
         mainLayout.addView(chase, chaseLp);
         
         // 新增灯效按钮组
-        TextView effectsTitle = text("--- 灯效动画 ---");
+        TextView effectsTitle = text("--- 灯效动画 ---", 16, true);
         effectsTitle.setGravity(17); // CENTER
         LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(-1, -2);
         titleLp.topMargin = dp(16);
