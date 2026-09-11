@@ -284,7 +284,7 @@ public class LedController {
         float q = value * (1 - f * saturation);
         float t = value * (1 - (1 - f) * saturation);
         
-        float r, g, b;
+        float r = 0, g = 0, b = 0;
         switch (h) {
             case 0:
             case 6:
