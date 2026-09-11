@@ -63,6 +63,7 @@ public class LedController {
     }
     
     public void turnOffAll() {
+        stopAnimation(); // Stop any running animation first
         for (int i = 0; i < LED_COUNT; i++) {
             sendPerPixelColor(i, 0, 0, 0);
         }

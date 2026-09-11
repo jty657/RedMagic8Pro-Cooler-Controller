@@ -36,6 +36,9 @@ public class MainActivity extends Activity {
     private Button[] ledButtons = new Button[LED_COUNT];
     private SeekBar redSeek, greenSeek, blueSeek;
     private TextView redValue, greenValue, blueValue;
+    private TextView logView;
+    private ScrollView logScrollView;
+    private final StringBuilder logBuffer = new StringBuilder();
     
     private int selectedLed = 0;
     private int red = 32;
@@ -52,11 +55,15 @@ public class MainActivity extends Activity {
         fanController = new FanController(bleManager, writeQueue);
         ledController = new LedController(bleManager, writeQueue);
         
-        writeQueue.setStatusListener(this::setStatus);
+        writeQueue.setStatusListener(message -> {
+            setStatus(message);
+            addLog("[WriteQueue] " + message);
+        });
         bleManager.setStatusListener(new BleManager.StatusListener() {
             @Override
             public void onStatus(String message) {
                 setStatus(message);
+                addLog("[BLE] " + message);
             }
             
             @Override
@@ -86,10 +93,10 @@ public class MainActivity extends Activity {
         scrollView.addView(mainLayout);
         
         // Title
-        mainLayout.addView(text("红魔 8 Pro · 逐灯/原生控制测试器 V4", 22, true));
+        mainLayout.addView(text("红魔 8 Pro · 逐灯/原生控制测试器 V5", 22, true));
         
         // Hint
-        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V4 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。新增9种炫酷灯效！", 14, false);
+        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V5 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。9种灯效+全面日志！", 14, false);
         hint.setPadding(0, dp(4), 0, dp(10));
         mainLayout.addView(hint);
         
@@ -135,21 +142,33 @@ public class MainActivity extends Activity {
         
         LinearLayout fanRow1 = horizontal();
         Button manualBtn = button("应用手动档位");
-        manualBtn.setOnClickListener(v -> fanController.setManualFanLevel(fanLevel));
+        manualBtn.setOnClickListener(v -> {
+            addLog("设置手动档位: " + fanLevel);
+            fanController.setManualFanLevel(fanLevel);
+        });
         fanRow1.addView(manualBtn, weight());
         
         Button smartBtn = button("智能温控");
-        smartBtn.setOnClickListener(v -> fanController.setSmartMode());
+        smartBtn.setOnClickListener(v -> {
+            addLog("启动智能温控模式");
+            fanController.setSmartMode();
+        });
         fanRow1.addView(smartBtn, weight());
         mainLayout.addView(fanRow1);
         
         LinearLayout fanRow2 = horizontal();
         Button boostBtn = button("破坏神");
-        boostBtn.setOnClickListener(v -> fanController.setBoostMode());
+        boostBtn.setOnClickListener(v -> {
+            addLog("启动破坏神模式");
+            fanController.setBoostMode();
+        });
         fanRow2.addView(boostBtn, weight());
         
         Button powerOffBtn = button("关闭散热");
-        powerOffBtn.setOnClickListener(v -> fanController.powerOff());
+        powerOffBtn.setOnClickListener(v -> {
+            addLog("关闭散热器");
+            fanController.powerOff();
+        });
         fanRow2.addView(powerOffBtn, weight());
         mainLayout.addView(fanRow2);
         
@@ -161,21 +180,33 @@ public class MainActivity extends Activity {
         
         LinearLayout native1 = horizontal();
         Button mode01 = button("模式01 默认/联动");
-        mode01.setOnClickListener(v -> ledController.sendNativeLight(1, 0, 0, 0));
+        mode01.setOnClickListener(v -> {
+            addLog("原生灯光: 模式01");
+            ledController.sendNativeLight(1, 0, 0, 0);
+        });
         native1.addView(mode01, weight());
         
         Button mode03 = button("模式03 + RGB");
-        mode03.setOnClickListener(v -> ledController.sendNativeLight(3, red, green, blue));
+        mode03.setOnClickListener(v -> {
+            addLog(String.format("原生灯光: 模式03 RGB(%d,%d,%d)", red, green, blue));
+            ledController.sendNativeLight(3, red, green, blue);
+        });
         native1.addView(mode03, weight());
         mainLayout.addView(native1);
         
         LinearLayout native2 = horizontal();
         Button mode04 = button("模式04 + RGB");
-        mode04.setOnClickListener(v -> ledController.sendNativeLight(4, red, green, blue));
+        mode04.setOnClickListener(v -> {
+            addLog(String.format("原生灯光: 模式04 RGB(%d,%d,%d)", red, green, blue));
+            ledController.sendNativeLight(4, red, green, blue);
+        });
         native2.addView(mode04, weight());
         
         Button mode06 = button("模式06 原生");
-        mode06.setOnClickListener(v -> ledController.sendNativeLight(6, 0, 0, 0));
+        mode06.setOnClickListener(v -> {
+            addLog("原生灯光: 模式06");
+            ledController.sendNativeLight(6, 0, 0, 0);
+        });
         native2.addView(mode06, weight());
         mainLayout.addView(native2);
         
@@ -261,16 +292,25 @@ public class MainActivity extends Activity {
         // Action buttons
         LinearLayout actions = horizontal();
         Button apply = button("发送当前 RGB");
-        apply.setOnClickListener(v -> ledController.sendPerPixelColor(selectedLed, red, green, blue));
+        apply.setOnClickListener(v -> {
+            addLog(String.format("设置LED#%d RGB(%d,%d,%d)", selectedLed + 1, red, green, blue));
+            ledController.sendPerPixelColor(selectedLed, red, green, blue);
+        });
         actions.addView(apply, weight());
         
         Button off = button("全部熄灭");
-        off.setOnClickListener(v -> ledController.turnOffAll());
+        off.setOnClickListener(v -> {
+            addLog("全部LED熄灭");
+            ledController.turnOffAll();
+        });
         actions.addView(off, weight());
         mainLayout.addView(actions);
         
         Button chase = button("单灯跑一圈（红=32）");
-        chase.setOnClickListener(v -> ledController.chaseAnimation());
+        chase.setOnClickListener(v -> {
+            addLog("启动单灯跑圈动画");
+            ledController.chaseAnimation();
+        });
         LinearLayout.LayoutParams chaseLp = new LinearLayout.LayoutParams(-1, dp(52));
         chaseLp.topMargin = dp(8);
         mainLayout.addView(chase, chaseLp);
@@ -281,45 +321,70 @@ public class MainActivity extends Activity {
         // Row 1: Rainbow effects
         LinearLayout effects1 = horizontal();
         Button rainbowChase = button("🌈 彩虹跑马");
-        rainbowChase.setOnClickListener(v -> ledController.rainbowChase());
+        rainbowChase.setOnClickListener(v -> {
+            addLog("启动灯效: 彩虹跑马灯");
+            ledController.rainbowChase();
+        });
         effects1.addView(rainbowChase, weight());
         
         Button rainbowCycle = button("🌈 彩虹循环");
-        rainbowCycle.setOnClickListener(v -> ledController.rainbowCycle());
+        rainbowCycle.setOnClickListener(v -> {
+            addLog("启动灯效: 彩虹循环");
+            ledController.rainbowCycle();
+        });
         effects1.addView(rainbowCycle, weight());
         
         Button waveEffect = button("🌊 彩虹波浪");
-        waveEffect.setOnClickListener(v -> ledController.waveEffect());
+        waveEffect.setOnClickListener(v -> {
+            addLog("启动灯效: 彩虹波浪");
+            ledController.waveEffect();
+        });
         effects1.addView(waveEffect, weight());
         mainLayout.addView(effects1);
         
         // Row 2: Dynamic effects
         LinearLayout effects2 = horizontal();
         Button meteorEffect = button("☄️ 流星拖尾");
-        meteorEffect.setOnClickListener(v -> ledController.meteorEffect());
+        meteorEffect.setOnClickListener(v -> {
+            addLog("启动灯效: 流星拖尾");
+            ledController.meteorEffect();
+        });
         effects2.addView(meteorEffect, weight());
         
         Button theaterEffect = button("🎭 剧场追逐");
-        theaterEffect.setOnClickListener(v -> ledController.theaterChase(80, 0, 80));
+        theaterEffect.setOnClickListener(v -> {
+            addLog("启动灯效: 剧场追逐");
+            ledController.theaterChase(80, 0, 80);
+        });
         effects2.addView(theaterEffect, weight());
         
         Button strobeEffect = button("⚡ 频闪");
-        strobeEffect.setOnClickListener(v -> ledController.strobeEffect(100, 100, 100));
+        strobeEffect.setOnClickListener(v -> {
+            addLog("启动灯效: 频闪");
+            ledController.strobeEffect(100, 100, 100);
+        });
         effects2.addView(strobeEffect, weight());
         mainLayout.addView(effects2);
         
         // Row 3: Breathing and wipe
         LinearLayout effects3 = horizontal();
         Button breathingEffect = button("💫 呼吸灯");
-        breathingEffect.setOnClickListener(v -> ledController.breathingEffect(80, 40, 0));
+        breathingEffect.setOnClickListener(v -> {
+            addLog("启动灯效: 呼吸灯");
+            ledController.breathingEffect(80, 40, 0);
+        });
         effects3.addView(breathingEffect, weight());
         
         Button colorWipe = button("🎨 颜色填充");
-        colorWipe.setOnClickListener(v -> ledController.colorWipe(red, green, blue));
+        colorWipe.setOnClickListener(v -> {
+            addLog(String.format("启动灯效: 颜色填充 RGB(%d,%d,%d)", red, green, blue));
+            ledController.colorWipe(red, green, blue);
+        });
         effects3.addView(colorWipe, weight());
         
         Button stopAnimation = button("⏹️ 停止动画");
         stopAnimation.setOnClickListener(v -> {
+            addLog("停止所有LED动画");
             ledController.stopAnimation();
             setStatus("已停止动画");
         });
@@ -334,6 +399,36 @@ public class MainActivity extends Activity {
                 "破坏神：1011=02 → 1018=00 → 1012=50 → 1017=01", 13, false);
         protocol.setPadding(0, dp(14), 0, 0);
         mainLayout.addView(protocol);
+        
+        // Log section
+        addSection(mainLayout, "📝 操作日志");
+        
+        // Log controls
+        LinearLayout logControls = horizontal();
+        Button clearLog = button("清空日志");
+        clearLog.setOnClickListener(v -> clearLog());
+        logControls.addView(clearLog, weight());
+        
+        Button copyLog = button("复制日志");
+        copyLog.setOnClickListener(v -> copyLogToClipboard());
+        logControls.addView(copyLog, weight());
+        mainLayout.addView(logControls);
+        
+        // Log view
+        logScrollView = new ScrollView(this);
+        logScrollView.setBackgroundColor(Color.rgb(240, 240, 240));
+        LinearLayout.LayoutParams logScrollLp = new LinearLayout.LayoutParams(-1, dp(200));
+        logScrollLp.topMargin = dp(8);
+        
+        logView = new TextView(this);
+        logView.setTextSize(11);
+        logView.setTextColor(Color.rgb(60, 60, 60));
+        logView.setPadding(dp(8), dp(8), dp(8), dp(8));
+        logView.setTypeface(Typeface.MONOSPACE);
+        logScrollView.addView(logView);
+        mainLayout.addView(logScrollView, logScrollLp);
+        
+        addLog("=== 应用启动 ===");
         
         return scrollView;
     }
@@ -374,6 +469,7 @@ public class MainActivity extends Activity {
         redValue.setText("R: " + r);
         greenValue.setText("G: " + g);
         blueValue.setText("B: " + b);
+        addLog(String.format("预设颜色: RGB(%d,%d,%d)", r, g, b));
     }
     
     private void updateFanLabel() {
@@ -462,6 +558,51 @@ public class MainActivity extends Activity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQ_PERMISSIONS && !hasPermissions()) {
             Toast.makeText(this, "需要附近设备/蓝牙权限才能扫描散热器", Toast.LENGTH_LONG).show();
+        }
+    }
+    
+    private void addLog(String message) {
+        runOnUiThread(() -> {
+            if (logView == null) return;
+            
+            // Add timestamp
+            String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                    .format(new java.util.Date());
+            String logLine = "[" + timestamp + "] " + message + "\n";
+            
+            logBuffer.append(logLine);
+            
+            // Keep only last 100 lines
+            String[] lines = logBuffer.toString().split("\n");
+            if (lines.length > 100) {
+                logBuffer.setLength(0);
+                for (int i = lines.length - 100; i < lines.length; i++) {
+                    logBuffer.append(lines[i]).append("\n");
+                }
+            }
+            
+            logView.setText(logBuffer.toString());
+            
+            // Auto scroll to bottom
+            logScrollView.post(() -> logScrollView.fullScroll(ScrollView.FOCUS_DOWN));
+        });
+    }
+    
+    private void clearLog() {
+        logBuffer.setLength(0);
+        if (logView != null) {
+            logView.setText("");
+        }
+        addLog("=== 日志已清空 ===");
+    }
+    
+    private void copyLogToClipboard() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            android.content.ClipboardManager clipboard = 
+                (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("操作日志", logBuffer.toString());
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "日志已复制到剪贴板", Toast.LENGTH_SHORT).show();
         }
     }
 }
