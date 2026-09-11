@@ -275,6 +275,47 @@ public class MainActivity extends Activity {
         chaseLp.topMargin = dp(8);
         mainLayout.addView(chase, chaseLp);
         
+        // 新增灯效按钮组
+        TextView effectsTitle = text("━━━ 灯效动画 ━━━");
+        effectsTitle.setGravity(17); // CENTER
+        LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(-1, -2);
+        titleLp.topMargin = dp(16);
+        titleLp.bottomMargin = dp(8);
+        mainLayout.addView(effectsTitle, titleLp);
+        
+        // 第一行：彩虹跑马灯、呼吸灯
+        LinearLayout effectsRow1 = horizontal();
+        Button rainbow = button("🌈 彩虹跑马灯");
+        rainbow.setOnClickListener(v -> ledController.rainbowMarquee());
+        effectsRow1.addView(rainbow, weight());
+        
+        Button breathing = button("💙 蓝色呼吸");
+        breathing.setOnClickListener(v -> ledController.breathingEffect(0, 32, 64));
+        effectsRow1.addView(breathing, weight());
+        mainLayout.addView(effectsRow1);
+        
+        // 第二行：流星、波浪
+        LinearLayout effectsRow2 = horizontal();
+        Button meteor = button("☄️ 流星划过");
+        meteor.setOnClickListener(v -> ledController.meteorEffect());
+        effectsRow2.addView(meteor, weight());
+        
+        Button wave = button("🌊 彩虹波浪");
+        wave.setOnClickListener(v -> ledController.waveEffect());
+        effectsRow2.addView(wave, weight());
+        mainLayout.addView(effectsRow2);
+        
+        // 第三行：闪烁、对向奔跑
+        LinearLayout effectsRow3 = horizontal();
+        Button sparkle = button("✨ 星光闪烁");
+        sparkle.setOnClickListener(v -> ledController.sparkleEffect());
+        effectsRow3.addView(sparkle, weight());
+        
+        Button dualChase = button("🔴🔵 对向奔跑");
+        dualChase.setOnClickListener(v -> ledController.dualChaseEffect());
+        effectsRow3.addView(dualChase, weight());
+        mainLayout.addView(effectsRow3);
+        
         // Protocol info
         TextView protocol = text("逐灯双包：F0 + 灯珠编号 + R + G（暂存）\\n" +
                 "　　　　　 F1 + 灯珠编号 + B + 00（提交并刷新）\\n" +
