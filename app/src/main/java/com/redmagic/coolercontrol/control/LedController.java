@@ -70,9 +70,16 @@ public class LedController {
     }
     
     public void chaseAnimation() {
-        for (int i = 0; i < LED_COUNT; i++) {
-            final int ledIndex = i;
-            mainHandler.postDelayed(() -> {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int ledIndex = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
                 // Turn off all first
                 for (int j = 0; j < LED_COUNT; j++) {
                     if (j != ledIndex) {
@@ -81,11 +88,13 @@ public class LedController {
                 }
                 // Turn on current LED
                 sendPerPixelColor(ledIndex, 32, 0, 0);
-            }, i * 300L);
-        }
+                
+                ledIndex = (ledIndex + 1) % LED_COUNT;
+                mainHandler.postDelayed(this, 300);
+            }
+        };
         
-        // Turn off all at the end
-        mainHandler.postDelayed(this::turnOffAll, LED_COUNT * 300L);
+        mainHandler.post(currentAnimation);
     }
     
     /**
@@ -93,10 +102,9 @@ public class LedController {
      */
     public void stopAnimation() {
         isAnimationRunning = false;
-        if (currentAnimation != null) {
-            mainHandler.removeCallbacks(currentAnimation);
-            currentAnimation = null;
-        }
+        // Remove all pending callbacks and messages from the handler
+        mainHandler.removeCallbacksAndMessages(null);
+        currentAnimation = null;
     }
     
     /**
@@ -327,13 +335,27 @@ public class LedController {
      */
     public void colorWipe(int r, int g, int b) {
         stopAnimation();
+        isAnimationRunning = true;
         
-        for (int i = 0; i < LED_COUNT; i++) {
-            final int index = i;
-            mainHandler.postDelayed(() -> {
+        currentAnimation = new Runnable() {
+            int index = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
                 sendPerPixelColor(index, r, g, b);
-            }, i * 100L);
-        }
+                
+                index++;
+                if (index < LED_COUNT) {
+                    mainHandler.postDelayed(this, 100);
+                } else {
+                    isAnimationRunning = false;
+                }
+            }
+        };
+        
+        mainHandler.post(currentAnimation);
     }
     
     /**
