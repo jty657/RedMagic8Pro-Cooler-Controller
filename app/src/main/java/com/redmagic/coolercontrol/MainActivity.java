@@ -86,10 +86,10 @@ public class MainActivity extends Activity {
         scrollView.addView(mainLayout);
         
         // Title
-        mainLayout.addView(text("红魔 8 Pro · 逐灯/原生控制测试器 V3", 22, true));
+        mainLayout.addView(text("红魔 8 Pro · 逐灯/原生控制测试器 V4", 22, true));
         
         // Hint
-        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V3 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。", 14, false);
+        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V4 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。新增9种炫酷灯效！", 14, false);
         hint.setPadding(0, dp(4), 0, dp(10));
         mainLayout.addView(hint);
         
@@ -275,46 +275,56 @@ public class MainActivity extends Activity {
         chaseLp.topMargin = dp(8);
         mainLayout.addView(chase, chaseLp);
         
-        // 新增灯效按钮组
-        TextView effectsTitle = text("--- 灯效动画 ---", 16, true);
-        effectsTitle.setGravity(17); // CENTER
-        LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(-1, -2);
-        titleLp.topMargin = dp(16);
-        titleLp.bottomMargin = dp(8);
-        mainLayout.addView(effectsTitle, titleLp);
+        // New LED effects section
+        addSection(mainLayout, "🎨 灯效动画");
         
-        // 第一行：彩虹跑马灯、呼吸灯
-        LinearLayout effectsRow1 = horizontal();
-        Button rainbow = button("彩虹跑马灯");
-        rainbow.setOnClickListener(v -> ledController.rainbowMarquee());
-        effectsRow1.addView(rainbow, weight());
+        // Row 1: Rainbow effects
+        LinearLayout effects1 = horizontal();
+        Button rainbowChase = button("🌈 彩虹跑马");
+        rainbowChase.setOnClickListener(v -> ledController.rainbowChase());
+        effects1.addView(rainbowChase, weight());
         
-        Button breathing = button("蓝色呼吸");
-        breathing.setOnClickListener(v -> ledController.breathingEffect(0, 32, 64));
-        effectsRow1.addView(breathing, weight());
-        mainLayout.addView(effectsRow1);
+        Button rainbowCycle = button("🌈 彩虹循环");
+        rainbowCycle.setOnClickListener(v -> ledController.rainbowCycle());
+        effects1.addView(rainbowCycle, weight());
         
-        // 第二行：流星、波浪
-        LinearLayout effectsRow2 = horizontal();
-        Button meteor = button("流星划过");
-        meteor.setOnClickListener(v -> ledController.meteorEffect());
-        effectsRow2.addView(meteor, weight());
+        Button waveEffect = button("🌊 彩虹波浪");
+        waveEffect.setOnClickListener(v -> ledController.waveEffect());
+        effects1.addView(waveEffect, weight());
+        mainLayout.addView(effects1);
         
-        Button wave = button("彩虹波浪");
-        wave.setOnClickListener(v -> ledController.waveEffect());
-        effectsRow2.addView(wave, weight());
-        mainLayout.addView(effectsRow2);
+        // Row 2: Dynamic effects
+        LinearLayout effects2 = horizontal();
+        Button meteorEffect = button("☄️ 流星拖尾");
+        meteorEffect.setOnClickListener(v -> ledController.meteorEffect());
+        effects2.addView(meteorEffect, weight());
         
-        // 第三行：闪烁、对向奔跑
-        LinearLayout effectsRow3 = horizontal();
-        Button sparkle = button("星光闪烁");
-        sparkle.setOnClickListener(v -> ledController.sparkleEffect());
-        effectsRow3.addView(sparkle, weight());
+        Button theaterEffect = button("🎭 剧场追逐");
+        theaterEffect.setOnClickListener(v -> ledController.theaterChase(80, 0, 80));
+        effects2.addView(theaterEffect, weight());
         
-        Button dualChase = button("对向奔跑");
-        dualChase.setOnClickListener(v -> ledController.dualChaseEffect());
-        effectsRow3.addView(dualChase, weight());
-        mainLayout.addView(effectsRow3);
+        Button strobeEffect = button("⚡ 频闪");
+        strobeEffect.setOnClickListener(v -> ledController.strobeEffect(100, 100, 100));
+        effects2.addView(strobeEffect, weight());
+        mainLayout.addView(effects2);
+        
+        // Row 3: Breathing and wipe
+        LinearLayout effects3 = horizontal();
+        Button breathingEffect = button("💫 呼吸灯");
+        breathingEffect.setOnClickListener(v -> ledController.breathingEffect(80, 40, 0));
+        effects3.addView(breathingEffect, weight());
+        
+        Button colorWipe = button("🎨 颜色填充");
+        colorWipe.setOnClickListener(v -> ledController.colorWipe(red, green, blue));
+        effects3.addView(colorWipe, weight());
+        
+        Button stopAnimation = button("⏹️ 停止动画");
+        stopAnimation.setOnClickListener(v -> {
+            ledController.stopAnimation();
+            setStatus("已停止动画");
+        });
+        effects3.addView(stopAnimation, weight());
+        mainLayout.addView(effects3);
         
         // Protocol info
         TextView protocol = text("逐灯双包：F0 + 灯珠编号 + R + G（暂存）\\n" +
