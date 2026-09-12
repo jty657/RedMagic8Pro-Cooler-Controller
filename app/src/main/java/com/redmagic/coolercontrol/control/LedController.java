@@ -105,6 +105,8 @@ public class LedController {
         // Remove all pending callbacks and messages from the handler
         mainHandler.removeCallbacksAndMessages(null);
         currentAnimation = null;
+        // Clear WriteQueue to stop any pending LED writes
+        writeQueue.clear();
     }
     
     /**

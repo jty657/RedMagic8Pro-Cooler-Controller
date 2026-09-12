@@ -89,14 +89,17 @@ public class MainActivity extends Activity {
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.VERTICAL);
         mainLayout.setPadding(p, dp(12), p, dp(28));
-        mainLayout.setBackgroundColor(Color.rgb(250, 250, 250));
+        mainLayout.setBackgroundColor(Color.rgb(245, 247, 250)); // Light modern gray
         scrollView.addView(mainLayout);
         
         // Title
-        mainLayout.addView(text("红魔 8 Pro · 逐灯/原生控制测试器 V5", 22, true));
+        TextView titleView = text("红魔 8 Pro · 逐灯/原生控制测试器 V6", 22, true);
+        titleView.setTextColor(Color.rgb(66, 133, 244));
+        titleView.setPadding(0, dp(4), 0, dp(4));
+        mainLayout.addView(titleView);
         
         // Hint
-        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V5 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。9种灯效+全面日志！", 14, false);
+        TextView hint = text("适用于 8.4.7 PerPixel F0/F1 COMPAT V6 固件。1013 始终保持原厂 4 字节；逐灯使用 F0/F1 双包，RGB 已实机确认。动画停止修复+完整BLE日志+现代UI！", 14, false);
         hint.setPadding(0, dp(4), 0, dp(10));
         mainLayout.addView(hint);
         
@@ -416,14 +419,19 @@ public class MainActivity extends Activity {
         
         // Log view
         logScrollView = new ScrollView(this);
-        logScrollView.setBackgroundColor(Color.rgb(240, 240, 240));
-        LinearLayout.LayoutParams logScrollLp = new LinearLayout.LayoutParams(-1, dp(200));
+        android.graphics.drawable.GradientDrawable logBg = new android.graphics.drawable.GradientDrawable();
+        logBg.setColor(Color.rgb(245, 245, 245));
+        logBg.setCornerRadius(dp(8));
+        logBg.setStroke(dp(1), Color.rgb(200, 200, 200));
+        logScrollView.setBackground(logBg);
+        logScrollView.setElevation(dp(2));
+        LinearLayout.LayoutParams logScrollLp = new LinearLayout.LayoutParams(-1, dp(300));
         logScrollLp.topMargin = dp(8);
         
         logView = new TextView(this);
         logView.setTextSize(11);
-        logView.setTextColor(Color.rgb(60, 60, 60));
-        logView.setPadding(dp(8), dp(8), dp(8), dp(8));
+        logView.setTextColor(Color.rgb(40, 40, 40));
+        logView.setPadding(dp(12), dp(12), dp(12), dp(12));
         logView.setTypeface(Typeface.MONOSPACE);
         logScrollView.addView(logView);
         mainLayout.addView(logScrollView, logScrollLp);
@@ -434,9 +442,22 @@ public class MainActivity extends Activity {
     }
     
     private void addSection(LinearLayout parent, String title) {
+        // Add divider line
+        View divider = new View(this);
+        divider.setBackgroundColor(Color.rgb(200, 200, 200));
+        LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(-1, dp(1));
+        dividerParams.setMargins(0, dp(20), 0, dp(10));
+        parent.addView(divider, dividerParams);
+        
+        // Add section title with card background
         TextView section = text(title, 18, true);
-        section.setPadding(0, dp(18), 0, dp(8));
-        section.setTextColor(Color.rgb(40, 90, 150));
+        section.setPadding(dp(12), dp(10), dp(12), dp(10));
+        section.setTextColor(Color.rgb(255, 255, 255));
+        android.graphics.drawable.GradientDrawable cardBg = new android.graphics.drawable.GradientDrawable();
+        cardBg.setColor(Color.rgb(66, 133, 244));
+        cardBg.setCornerRadius(dp(8));
+        section.setBackground(cardBg);
+        section.setElevation(dp(2));
         parent.addView(section);
     }
     
@@ -514,6 +535,13 @@ public class MainActivity extends Activity {
         b.setText(s);
         b.setAllCaps(false);
         b.setTextSize(14.0f);
+        // Add rounded corners and shadow
+        android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+        gd.setColor(Color.rgb(66, 133, 244)); // Material Blue
+        gd.setCornerRadius(dp(8));
+        b.setBackground(gd);
+        b.setTextColor(Color.WHITE);
+        b.setElevation(dp(2));
         return b;
     }
     

@@ -47,6 +47,8 @@ public class WriteQueue {
         synchronized (queue) {
             queue.offer(op);
         }
+        // Log enqueue with full data
+        setStatus("[WriteQueue] 入队: " + op.label + " ← [" + hex(op.data) + "]");
         pump();
     }
     
@@ -98,10 +100,13 @@ public class WriteQueue {
         if (!started) {
             writing = false;
             activeWrite = null;
-            setStatus("写入启动失败 [" + next.label + "]: " + hex(next.data));
+            setStatus("[WriteQueue] 写入启动失败: " + next.label + " [" + hex(next.data) + "]");
             mainHandler.postDelayed(this::pump, 80);
             return;
         }
+        
+        // Log successful write start
+        setStatus("[WriteQueue] 写入成功: " + next.label + " [" + hex(next.data) + "]");
         
         // For write-without-response, simulate completion
         if (writeType == BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) {
@@ -117,7 +122,7 @@ public class WriteQueue {
         if (activeWrite != null && characteristic.getUuid().equals(activeWrite.characteristic.getUuid())) {
             writing = false;
             if (status != BluetoothGatt.GATT_SUCCESS) {
-                setStatus(activeWrite.label + " 写入失败: " + status);
+                setStatus("[WriteQueue] 写入失败: " + activeWrite.label + " (status: " + status + ")");
             }
             activeWrite = null;
             mainHandler.post(this::pump);

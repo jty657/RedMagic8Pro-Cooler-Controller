@@ -62,17 +62,18 @@ public class BleManager {
         public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
             String address = device.getAddress();
+            String name = device.getName();
             if (seenAddresses.add(address)) {
                 devices.add(device);
                 mainHandler.post(() -> 
-                    setStatus("已发现 " + devices.size() + " 个 BLE 设备…")
+                    setStatus("[BLE] 发现设备: " + (name != null ? name : "未命名") + " (" + address + ")")
                 );
             }
         }
         
         @Override
         public void onScanFailed(int errorCode) {
-            mainHandler.post(() -> setStatus("扫描失败，错误码 " + errorCode));
+            mainHandler.post(() -> setStatus("[BLE] 扫描失败，错误码: " + errorCode));
         }
     };
     
@@ -80,25 +81,29 @@ public class BleManager {
         @Override
         public void onConnectionStateChange(BluetoothGatt g, int statusCode, int newState) {
             if (newState == BluetoothGatt.STATE_CONNECTED && statusCode == BluetoothGatt.GATT_SUCCESS) {
-                mainHandler.post(() -> setStatus("已连接，正在发现服务…"));
+                mainHandler.post(() -> setStatus("[BLE] 连接成功，正在发现服务…"));
                 try {
                     g.discoverServices();
                 } catch (SecurityException e) {
-                    mainHandler.post(() -> setStatus("发现服务权限不足"));
+                    mainHandler.post(() -> setStatus("[BLE] 发现服务权限不足"));
                 }
             } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
                 clearCharacteristics();
                 writeQueue.clear();
-                mainHandler.post(() -> setStatus("已断开"));
+                mainHandler.post(() -> setStatus("[BLE] 已断开"));
+            } else {
+                mainHandler.post(() -> setStatus("[BLE] 连接状态变更: state=" + newState + ", status=" + statusCode));
             }
         }
         
         @Override
         public void onServicesDiscovered(BluetoothGatt g, int statusCode) {
             if (statusCode != BluetoothGatt.GATT_SUCCESS) {
-                mainHandler.post(() -> setStatus("服务发现失败: " + statusCode));
+                mainHandler.post(() -> setStatus("[BLE] 服务发现失败: " + statusCode));
                 return;
             }
+            
+            mainHandler.post(() -> setStatus("[BLE] 正在解析GATT特征..."));
             
             clearCharacteristics();
             
@@ -124,9 +129,7 @@ public class BleManager {
             
             final int foundCount = count;
             mainHandler.post(() -> {
-                setStatus("就绪：已发现原生控制特征 " + foundCount + "/5\\n" +
-                        "1011=" + yesNo(c1011) + " 1012=" + yesNo(c1012) + " 1013=" + yesNo(c1013) +
-                        " 1017=" + yesNo(c1017) + " 1018=" + yesNo(c1018));
+                setStatus("[BLE] 就绪：已发现原生控制特征 " + foundCount + "/5 (1011=" + yesNo(c1011) + ", 1012=" + yesNo(c1012) + ", 1013=" + yesNo(c1013) + ", 1017=" + yesNo(c1017) + ", 1018=" + yesNo(c1018) + ")");
                 if (statusListener != null) {
                     statusListener.onCharacteristicsReady();
                 }
@@ -173,12 +176,13 @@ public class BleManager {
         devices.clear();
         seenAddresses.clear();
         scanning = true;
-        setStatus("正在扫描附近 BLE 设备…");
+        setStatus("[BLE] 开始扫描...");
         
         try {
             scanner.startScan(scanCallback);
+            setStatus("[BLE] 扫描中，请等待6秒...");
         } catch (SecurityException e) {
-            setStatus("扫描权限不足");
+            setStatus("[BLE] 扫描权限不足");
             return;
         }
         
@@ -192,6 +196,7 @@ public class BleManager {
         if (scanning && scanner != null) {
             try {
                 scanner.stopScan(scanCallback);
+                setStatus("[BLE] 扫描完成，发现 " + devices.size() + " 个设备");
             } catch (SecurityException e) {
                 // Ignore
             }
