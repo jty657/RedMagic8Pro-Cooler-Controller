@@ -394,4 +394,632 @@ public class LedController {
             (int) ((b + m) * 255)
         };
     }
+    
+    // ============ NEW EFFECTS (10-30) ============
+    
+    /**
+     * Fire effect - flickering red/orange flames
+     */
+    public void fireEffect() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int r = 200 + (int)(Math.random() * 55); // 200-255
+                    int g = 60 + (int)(Math.random() * 25);   // 60-85
+                    int b = 0;
+                    sendPerPixelColor(i, r, g, b);
+                }
+                
+                mainHandler.postDelayed(this, 80);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Water effect - blue wave from center
+     */
+    public void waterEffect() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int wavePos = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                int center = LED_COUNT / 2;
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int dist = Math.abs(i - center);
+                    int phase = (wavePos + dist * 40) % 360;
+                    float brightness = (float)(Math.sin(Math.toRadians(phase)) + 1) / 2;
+                    int blue = (int)(brightness * 100);
+                    sendPerPixelColor(i, 0, blue / 3, blue);
+                }
+                
+                wavePos = (wavePos + 15) % 360;
+                mainHandler.postDelayed(this, 50);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Sunrise effect - deep blue to yellow/orange
+     */
+    public void sunriseEffect() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int step = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                float progress = (step % 200) / 200.0f;
+                int r = (int)(progress * 255);
+                int g = (int)(progress * 180);
+                int b = (int)((1 - progress) * 100);
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, r, g, b);
+                }
+                
+                step++;
+                mainHandler.postDelayed(this, 40);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Sunset effect - orange/red to deep purple
+     */
+    public void sunsetEffect() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int step = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                float progress = (step % 200) / 200.0f;
+                int r = (int)((1 - progress * 0.5) * 200);
+                int g = (int)((1 - progress) * 100);
+                int b = (int)(progress * 80);
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, r, g, b);
+                }
+                
+                step++;
+                mainHandler.postDelayed(this, 40);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Aurora borealis - flowing green/purple waves
+     */
+    public void auraBorealis() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int offset = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    float wave1 = (float)Math.sin(Math.toRadians((i * 30 + offset) % 360));
+                    float wave2 = (float)Math.sin(Math.toRadians((i * 20 + offset * 1.5) % 360));
+                    int g = (int)((wave1 + 1) * 40);
+                    int b = (int)((wave2 + 1) * 30);
+                    sendPerPixelColor(i, 10, g, b);
+                }
+                
+                offset = (offset + 5) % 360;
+                mainHandler.postDelayed(this, 60);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Candle flicker - warm yellow gentle flicker
+     */
+    public void candleFlicker() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int flicker = 40 + (int)(Math.random() * 30);
+                    sendPerPixelColor(i, flicker, flicker - 10, 0);
+                }
+                
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Dual chase - two dots moving from ends to center
+     */
+    public void dualChase() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int pos = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, 0, 0, 0);
+                }
+                
+                int pos1 = pos % LED_COUNT;
+                int pos2 = (LED_COUNT - 1 - pos) % LED_COUNT;
+                sendPerPixelColor(pos1, 0, 50, 0);
+                sendPerPixelColor(pos2, 50, 0, 0);
+                
+                pos++;
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Ping pong - single dot bouncing back and forth
+     */
+    public void pingPong() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int pos = 0;
+            int direction = 1;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, 0, 0, 0);
+                }
+                
+                sendPerPixelColor(pos, 50, 50, 0);
+                
+                pos += direction;
+                if (pos >= LED_COUNT - 1 || pos <= 0) {
+                    direction = -direction;
+                }
+                
+                mainHandler.postDelayed(this, 80);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Spiral - rotating spiral pattern
+     */
+    public void spiral() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int offset = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int hue = ((i * 60 + offset) % 360);
+                    float brightness = (float)Math.sin(Math.toRadians(hue)) * 0.5f + 0.5f;
+                    int[] rgb = hsvToRgb(hue, 1.0f, brightness * 0.3f);
+                    sendPerPixelColor(i, rgb[0], rgb[1], rgb[2]);
+                }
+                
+                offset = (offset + 10) % 360;
+                mainHandler.postDelayed(this, 50);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Random blink - multiple LEDs randomly lighting up
+     */
+    public void randomBlink() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    if (Math.random() < 0.3) {
+                        int hue = (int)(Math.random() * 360);
+                        int[] rgb = hsvToRgb(hue, 1.0f, 0.4f);
+                        sendPerPixelColor(i, rgb[0], rgb[1], rgb[2]);
+                    } else {
+                        sendPerPixelColor(i, 0, 0, 0);
+                    }
+                }
+                
+                mainHandler.postDelayed(this, 150);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Snake - moving with trailing tail
+     */
+    public void snake() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int headPos = 0;
+            final int tailLength = 4;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, 0, 0, 0);
+                }
+                
+                for (int i = 0; i < tailLength; i++) {
+                    int pos = (headPos - i + LED_COUNT) % LED_COUNT;
+                    float intensity = 1.0f - (i / (float)tailLength);
+                    int brightness = (int)(intensity * 60);
+                    sendPerPixelColor(pos, 0, brightness, 0);
+                }
+                
+                headPos = (headPos + 1) % LED_COUNT;
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Scanner (KITT) - back and forth with fade trail
+     */
+    public void scanner() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int pos = 0;
+            int direction = 1;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int dist = Math.abs(i - pos);
+                    int brightness = Math.max(0, 80 - dist * 20);
+                    sendPerPixelColor(i, brightness, 0, 0);
+                }
+                
+                pos += direction;
+                if (pos >= LED_COUNT - 1 || pos <= 0) {
+                    direction = -direction;
+                }
+                
+                mainHandler.postDelayed(this, 60);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Comet - long trailing tail
+     */
+    public void comet() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int cometPos = 0;
+            final int cometLength = 8;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, 0, 0, 0);
+                }
+                
+                for (int i = 0; i < cometLength; i++) {
+                    int pos = (cometPos - i + LED_COUNT) % LED_COUNT;
+                    float intensity = 1.0f - (i / (float)cometLength);
+                    int brightness = (int)(intensity * 100);
+                    sendPerPixelColor(pos, brightness, brightness, brightness);
+                }
+                
+                cometPos = (cometPos + 1) % LED_COUNT;
+                mainHandler.postDelayed(this, 50);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Color fade - smooth RGB transition
+     */
+    public void colorFade(int r1, int g1, int b1, int r2, int g2, int b2) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int step = 0;
+            boolean forward = true;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                float progress = (step % 100) / 100.0f;
+                if (!forward) progress = 1.0f - progress;
+                
+                int r = (int)(r1 + (r2 - r1) * progress);
+                int g = (int)(g1 + (g2 - g1) * progress);
+                int b = (int)(b1 + (b2 - b1) * progress);
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, r, g, b);
+                }
+                
+                step++;
+                if (step >= 100) {
+                    step = 0;
+                    forward = !forward;
+                }
+                
+                mainHandler.postDelayed(this, 50);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Rainbow fade - all LEDs same color cycling through rainbow
+     */
+    public void rainbowFade() {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int hue = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                int[] rgb = hsvToRgb(hue, 1.0f, 0.3f);
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, rgb[0], rgb[1], rgb[2]);
+                }
+                
+                hue = (hue + 3) % 360;
+                mainHandler.postDelayed(this, 40);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Twinkle - each LED independently random brightness
+     */
+    public void twinkle(int r, int g, int b) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    if (Math.random() < 0.05) { // 5% chance to toggle
+                        if (Math.random() < 0.5) {
+                            sendPerPixelColor(i, r, g, b);
+                        } else {
+                            sendPerPixelColor(i, 0, 0, 0);
+                        }
+                    }
+                }
+                
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Sparkle - dark background with random bright spots
+     */
+    public void sparkle(int r, int g, int b) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                // Dim background
+                for (int i = 0; i < LED_COUNT; i++) {
+                    sendPerPixelColor(i, r/8, g/8, b/8);
+                }
+                
+                // Random bright sparkles
+                int numSparkles = 2 + (int)(Math.random() * 3);
+                for (int i = 0; i < numSparkles; i++) {
+                    int pos = (int)(Math.random() * LED_COUNT);
+                    sendPerPixelColor(pos, r, g, b);
+                }
+                
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Pulse - brightness wave from center outward
+     */
+    public void pulse(int r, int g, int b) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int pulsePos = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                int center = LED_COUNT / 2;
+                for (int i = 0; i < LED_COUNT; i++) {
+                    int dist = Math.abs(i - center);
+                    int effectiveDist = (pulsePos - dist + LED_COUNT) % LED_COUNT;
+                    float brightness = effectiveDist < 3 ? (1.0f - effectiveDist / 3.0f) : 0;
+                    sendPerPixelColor(i, (int)(r * brightness), (int)(g * brightness), (int)(b * brightness));
+                }
+                
+                pulsePos = (pulsePos + 1) % LED_COUNT;
+                mainHandler.postDelayed(this, 80);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Half and half - left/right different colors
+     */
+    public void halfAndHalf(int r1, int g1, int b1, int r2, int g2, int b2) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            boolean swap = false;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                int half = LED_COUNT / 2;
+                for (int i = 0; i < LED_COUNT; i++) {
+                    if ((i < half) != swap) {
+                        sendPerPixelColor(i, r1, g1, b1);
+                    } else {
+                        sendPerPixelColor(i, r2, g2, b2);
+                    }
+                }
+                
+                swap = !swap;
+                mainHandler.postDelayed(this, 500);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Alternate - odd/even LEDs alternating
+     */
+    public void alternate(int r, int g, int b) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            boolean oddOn = true;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    if ((i % 2 == 0) == oddOn) {
+                        sendPerPixelColor(i, r, g, b);
+                    } else {
+                        sendPerPixelColor(i, 0, 0, 0);
+                    }
+                }
+                
+                oddOn = !oddOn;
+                mainHandler.postDelayed(this, 300);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
+    
+    /**
+     * Loading - progress bar style filling and repeating
+     */
+    public void loading(int r, int g, int b) {
+        stopAnimation();
+        isAnimationRunning = true;
+        
+        currentAnimation = new Runnable() {
+            int fillPos = 0;
+            
+            @Override
+            public void run() {
+                if (!isAnimationRunning) return;
+                
+                for (int i = 0; i < LED_COUNT; i++) {
+                    if (i <= fillPos) {
+                        sendPerPixelColor(i, r, g, b);
+                    } else {
+                        sendPerPixelColor(i, 0, 0, 0);
+                    }
+                }
+                
+                fillPos++;
+                if (fillPos >= LED_COUNT) {
+                    fillPos = 0;
+                }
+                
+                mainHandler.postDelayed(this, 100);
+            }
+        };
+        mainHandler.post(currentAnimation);
+    }
 }

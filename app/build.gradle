@@ -10,8 +10,8 @@ android {
         applicationId "com.redmagic.coolercontrol"
         minSdk 26
         targetSdk 33
-        versionCode 5
-        versionName "2.2.0"
+        versionCode 6
+        versionName "2.3.0"
     }
 
     buildTypes {

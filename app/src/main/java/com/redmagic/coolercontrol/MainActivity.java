@@ -318,81 +318,149 @@ public class MainActivity extends Activity {
         chaseLp.topMargin = dp(8);
         mainLayout.addView(chase, chaseLp);
         
-        // New LED effects section
-        addSection(mainLayout, "🎨 灯效动画");
+        // 30 LED Effects Section
+        addSection(mainLayout, "🎨 30种炫酷灯效");
         
-        // Row 1: Rainbow effects
-        LinearLayout effects1 = horizontal();
-        Button rainbowChase = button("🌈 彩虹跑马");
-        rainbowChase.setOnClickListener(v -> {
-            addLog("启动灯效: 彩虹跑马灯");
-            ledController.rainbowChase();
-        });
-        effects1.addView(rainbowChase, weight());
+        // Row 1
+        LinearLayout row1 = horizontal();
+        Button chase = button("1.追逐");
+        chase.setOnClickListener(v -> { addLog("灯效: 追逐"); ledController.chaseAnimation(); });
+        row1.addView(chase, weight());
+        Button rainbowChase = button("2.彩虹跑马");
+        rainbowChase.setOnClickListener(v -> { addLog("灯效: 彩虹跑马"); ledController.rainbowChase(); });
+        row1.addView(rainbowChase, weight());
+        Button rainbowCycle = button("3.彩虹循环");
+        rainbowCycle.setOnClickListener(v -> { addLog("灯效: 彩虹循环"); ledController.rainbowCycle(); });
+        row1.addView(rainbowCycle, weight());
+        mainLayout.addView(row1);
         
-        Button rainbowCycle = button("🌈 彩虹循环");
-        rainbowCycle.setOnClickListener(v -> {
-            addLog("启动灯效: 彩虹循环");
-            ledController.rainbowCycle();
-        });
-        effects1.addView(rainbowCycle, weight());
+        // Row 2
+        LinearLayout row2 = horizontal();
+        Button breathing = button("4.呼吸");
+        breathing.setOnClickListener(v -> { addLog("灯效: 呼吸"); ledController.breathingEffect(80, 40, 0); });
+        row2.addView(breathing, weight());
+        Button wave = button("5.波浪");
+        wave.setOnClickListener(v -> { addLog("灯效: 波浪"); ledController.waveEffect(); });
+        row2.addView(wave, weight());
+        Button meteor = button("6.流星");
+        meteor.setOnClickListener(v -> { addLog("灯效: 流星"); ledController.meteorEffect(); });
+        row2.addView(meteor, weight());
+        mainLayout.addView(row2);
         
-        Button waveEffect = button("🌊 彩虹波浪");
-        waveEffect.setOnClickListener(v -> {
-            addLog("启动灯效: 彩虹波浪");
-            ledController.waveEffect();
-        });
-        effects1.addView(waveEffect, weight());
-        mainLayout.addView(effects1);
+        // Row 3
+        LinearLayout row3 = horizontal();
+        Button strobe = button("7.频闪");
+        strobe.setOnClickListener(v -> { addLog("灯效: 频闪"); ledController.strobeEffect(100, 100, 100); });
+        row3.addView(strobe, weight());
+        Button theater = button("8.剧场");
+        theater.setOnClickListener(v -> { addLog("灯效: 剧场"); ledController.theaterChase(80, 0, 80); });
+        row3.addView(theater, weight());
+        Button wipe = button("9.填充");
+        wipe.setOnClickListener(v -> { addLog("灯效: 填充"); ledController.colorWipe(red, green, blue); });
+        row3.addView(wipe, weight());
+        mainLayout.addView(row3);
         
-        // Row 2: Dynamic effects
-        LinearLayout effects2 = horizontal();
-        Button meteorEffect = button("☄️ 流星拖尾");
-        meteorEffect.setOnClickListener(v -> {
-            addLog("启动灯效: 流星拖尾");
-            ledController.meteorEffect();
-        });
-        effects2.addView(meteorEffect, weight());
+        // Row 4
+        LinearLayout row4 = horizontal();
+        Button fire = button("10.🔥火焰");
+        fire.setOnClickListener(v -> { addLog("灯效: 火焰"); ledController.fireEffect(); });
+        row4.addView(fire, weight());
+        Button water = button("11.💧水波");
+        water.setOnClickListener(v -> { addLog("灯效: 水波"); ledController.waterEffect(); });
+        row4.addView(water, weight());
+        Button sunrise = button("12.🌅日出");
+        sunrise.setOnClickListener(v -> { addLog("灯效: 日出"); ledController.sunriseEffect(); });
+        row4.addView(sunrise, weight());
+        mainLayout.addView(row4);
         
-        Button theaterEffect = button("🎭 剧场追逐");
-        theaterEffect.setOnClickListener(v -> {
-            addLog("启动灯效: 剧场追逐");
-            ledController.theaterChase(80, 0, 80);
-        });
-        effects2.addView(theaterEffect, weight());
+        // Row 5
+        LinearLayout row5 = horizontal();
+        Button sunset = button("13.🌇日落");
+        sunset.setOnClickListener(v -> { addLog("灯效: 日落"); ledController.sunsetEffect(); });
+        row5.addView(sunset, weight());
+        Button aurora = button("14.🌌极光");
+        aurora.setOnClickListener(v -> { addLog("灯效: 极光"); ledController.auraBorealis(); });
+        row5.addView(aurora, weight());
+        Button candle = button("15.🕯蜡烛");
+        candle.setOnClickListener(v -> { addLog("灯效: 蜡烛"); ledController.candleFlicker(); });
+        row5.addView(candle, weight());
+        mainLayout.addView(row5);
         
-        Button strobeEffect = button("⚡ 频闪");
-        strobeEffect.setOnClickListener(v -> {
-            addLog("启动灯效: 频闪");
-            ledController.strobeEffect(100, 100, 100);
-        });
-        effects2.addView(strobeEffect, weight());
-        mainLayout.addView(effects2);
+        // Row 6
+        LinearLayout row6 = horizontal();
+        Button dualChase = button("16.双向");
+        dualChase.setOnClickListener(v -> { addLog("灯效: 双向追逐"); ledController.dualChase(); });
+        row6.addView(dualChase, weight());
+        Button pingPong = button("17.乒乓");
+        pingPong.setOnClickListener(v -> { addLog("灯效: 乒乓"); ledController.pingPong(); });
+        row6.addView(pingPong, weight());
+        Button spiral = button("18.螺旋");
+        spiral.setOnClickListener(v -> { addLog("灯效: 螺旋"); ledController.spiral(); });
+        row6.addView(spiral, weight());
+        mainLayout.addView(row6);
         
-        // Row 3: Breathing and wipe
-        LinearLayout effects3 = horizontal();
-        Button breathingEffect = button("💫 呼吸灯");
-        breathingEffect.setOnClickListener(v -> {
-            addLog("启动灯效: 呼吸灯");
-            ledController.breathingEffect(80, 40, 0);
-        });
-        effects3.addView(breathingEffect, weight());
+        // Row 7
+        LinearLayout row7 = horizontal();
+        Button randomBlink = button("19.随机");
+        randomBlink.setOnClickListener(v -> { addLog("灯效: 随机闪烁"); ledController.randomBlink(); });
+        row7.addView(randomBlink, weight());
+        Button snake = button("20.🐍蛇");
+        snake.setOnClickListener(v -> { addLog("灯效: 贪吃蛇"); ledController.snake(); });
+        row7.addView(snake, weight());
+        Button scanner = button("21.扫描");
+        scanner.setOnClickListener(v -> { addLog("灯效: 扫描仪"); ledController.scanner(); });
+        row7.addView(scanner, weight());
+        mainLayout.addView(row7);
         
-        Button colorWipe = button("🎨 颜色填充");
-        colorWipe.setOnClickListener(v -> {
-            addLog(String.format("启动灯效: 颜色填充 RGB(%d,%d,%d)", red, green, blue));
-            ledController.colorWipe(red, green, blue);
-        });
-        effects3.addView(colorWipe, weight());
+        // Row 8
+        LinearLayout row8 = horizontal();
+        Button comet = button("22.☄彗星");
+        comet.setOnClickListener(v -> { addLog("灯效: 彗星"); ledController.comet(); });
+        row8.addView(comet, weight());
+        Button colorFade = button("23.渐变");
+        colorFade.setOnClickListener(v -> { addLog("灯效: 颜色渐变"); ledController.colorFade(100, 0, 0, 0, 0, 100); });
+        row8.addView(colorFade, weight());
+        Button rainbowFade = button("24.彩虹");
+        rainbowFade.setOnClickListener(v -> { addLog("灯效: 彩虹渐变"); ledController.rainbowFade(); });
+        row8.addView(rainbowFade, weight());
+        mainLayout.addView(row8);
         
-        Button stopAnimation = button("⏹️ 停止动画");
+        // Row 9
+        LinearLayout row9 = horizontal();
+        Button twinkle = button("25.✨闪烁");
+        twinkle.setOnClickListener(v -> { addLog("灯效: 星光闪烁"); ledController.twinkle(80, 80, 80); });
+        row9.addView(twinkle, weight());
+        Button sparkle = button("26.💫闪耀");
+        sparkle.setOnClickListener(v -> { addLog("灯效: 闪烁星"); ledController.sparkle(100, 100, 0); });
+        row9.addView(sparkle, weight());
+        Button pulse = button("27.脉冲");
+        pulse.setOnClickListener(v -> { addLog("灯效: 脉冲"); ledController.pulse(60, 0, 60); });
+        row9.addView(pulse, weight());
+        mainLayout.addView(row9);
+        
+        // Row 10
+        LinearLayout row10 = horizontal();
+        Button halfAndHalf = button("28.分半");
+        halfAndHalf.setOnClickListener(v -> { addLog("灯效: 分半"); ledController.halfAndHalf(100, 0, 0, 0, 0, 100); });
+        row10.addView(halfAndHalf, weight());
+        Button alternate = button("29.交替");
+        alternate.setOnClickListener(v -> { addLog("灯效: 交替"); ledController.alternate(80, 80, 0); });
+        row10.addView(alternate, weight());
+        Button loading = button("30.⌛加载");
+        loading.setOnClickListener(v -> { addLog("灯效: 加载"); ledController.loading(0, 100, 100); });
+        row10.addView(loading, weight());
+        mainLayout.addView(row10);
+        
+        // Stop button
+        LinearLayout stopRow = horizontal();
+        Button stopAnimation = button("⏹️ 停止所有灯效");
         stopAnimation.setOnClickListener(v -> {
             addLog("停止所有LED动画");
             ledController.stopAnimation();
             setStatus("已停止动画");
         });
-        effects3.addView(stopAnimation, weight());
-        mainLayout.addView(effects3);
+        stopRow.addView(stopAnimation, weight());
+        mainLayout.addView(stopRow);
         
         // Protocol info
         TextView protocol = text("逐灯双包：F0 + 灯珠编号 + R + G（暂存）\\n" +
